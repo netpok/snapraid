@@ -950,6 +950,14 @@ void state_config(struct snapraid_state* state, const char* path, const char* co
 					/* read the uuid, if unsupported use an empty one */
 					if (devuuid(dev, uuid, sizeof(uuid)) != 0) {
 						*uuid = 0;
+						char uuid_path[PATH_MAX];
+						snprintf(uuid_path, sizeof(uuid_path), "%s/.%s.uuid", dir, buffer);
+						FILE *uuid_file = fopen(uuid_path, "r");
+						if(uuid_file != NULL){
+							fscanf(uuid_file, "%s", uuid);
+							fclose(uuid_file);
+							log_fatal("Using '%s' as UUID for disk '%s' from '%s'\n", uuid, buffer, uuid_path);
+						}
 					}
 
 					/* fake a different UUID when testing */
